@@ -1,6 +1,7 @@
 package fern
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -47,23 +48,32 @@ var bee = [][]float32{{0.6178, 0, 0, -.6178, 0, 1, 0.5},
 var ferns = [][][]float32{barnsley, cyclosorus, modified, culcita, fishbone, tree, bee}
 
 var (
-	xMinFrac float32 = 0
-	xMaxFrac float32 = 0
-	yMinFrac float32 = 0
-	yMaxFrac float32 = 0
-	WIDTH            = 1920
-	HEIGHT           = 1080
-	probs            = make([]float32, 5)
-	affines          = make([][]float32, 4)
-	fractal          = make([][]float32, 1)
-	POINTS           = 100000
-	SCALE            = 1
-	points           = [][]int{}
+	xMinFrac   float32 = 0
+	xMaxFrac   float32 = 0
+	yMinFrac   float32 = 0
+	yMaxFrac   float32 = 0
+	WIDTH              = 1920
+	HEIGHT             = 1080
+	probs              = make([]float32, 5)
+	affines            = make([][]float32, 4)
+	lenFractal         = 0
+	POINTS             = 100000
+	radius             = 0.69
+	fractal            = make([][]float32, POINTS) // POINTS
+
+	SCALE  = 1
+	points = make([][]int, POINTS)
 )
+
+func initFractal() {
+	for i := range fractal {
+		fractal[i] = make([]float32, 3)
+	}
+}
 
 func MakeFractal() {
 
-	fractal[0] = append(fractal[0], float32(0))
+	initFractal()
 
 	makeMatrices()
 	var options = len(probs) - 1
@@ -89,49 +99,62 @@ func MakeFractal() {
 			yMaxFrac = fractal[i][1]
 		}
 	}
+	fmt.Print(lenFractal)
 }
 
 func makeMatrices() {
 
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 6; j++ {
-			affines[i] = append(affines[i], barnsley[i][j]) //barnsley[i][j]
+			affines[i] = append(affines[i], ferns[6][i][j]) //barnsley[i][j]
 		}
-		probs[i+1] = probs[i] + barnsley[i][6]
+		probs[i+1] = probs[i] + ferns[6][i][6] //barnsley[i][6]
 	}
 }
 
 func transform(matrix []float32) {
-	length := len(fractal)
+	lenFractal += 1
+	length := lenFractal
 	// fractal[0] = append(fractal[0], 0)
 
 	// fractal[0] = make([]float32, 1)
-	for i := 0; i < 3; i++ {
-		fractal = append(fractal[0:], append(make([]float32, 1), float32(0)))
-	}
-	if fractal[length] == nil {
-		fractal = append(fractal[length:], append(make([]float32, 1), float32(0)))
-		fractal[length] = append(fractal[length], (matrix[0]*fractal[length-1][0])+(matrix[1]*fractal[length-1][1])+(matrix[4]), (matrix[2]*fractal[length-1][0])+(matrix[3]*fractal[length-1][1])+(matrix[5]))
-	} else {
-		fractal[length] = append(fractal[length], (matrix[0]*fractal[length-1][0])+(matrix[1]*fractal[length-1][1])+(matrix[4]), (matrix[2]*fractal[length-1][0])+(matrix[3]*fractal[length-1][1])+(matrix[5]))
-	}
+	// for i := 0; i < 3; i++ {
+	// 	fractal = append(fractal[0:], append(make([]float32, 1), float32(0)))
+	// }
+	// if fractal[length] == nil {
+	// 	fractal = append(fractal[length:], append(make([]float32, 1), float32(0)))
+	fractal[length][0] = (matrix[0] * fractal[length-1][0]) + (matrix[1] * fractal[length-1][1]) + (matrix[4])
+	fractal[length][1] = (matrix[2] * fractal[length-1][0]) + (matrix[3] * fractal[length-1][1]) + (matrix[5])
+	//fractal[length] = append(fractal[length], (matrix[0]*fractal[length-1][0])+(matrix[1]*fractal[length-1][1])+(matrix[4]), (matrix[2]*fractal[length-1][0])+(matrix[3]*fractal[length-1][1])+(matrix[5]))
+	// } else {
+	// 	fractal[length] = append(fractal[length], (matrix[0]*fractal[length-1][0])+(matrix[1]*fractal[length-1][1])+(matrix[4]), (matrix[2]*fractal[length-1][0])+(matrix[3]*fractal[length-1][1])+(matrix[5]))
+	// }
 
-	fractal = append(fractal, fractal...)
-	fractal[0] = append(fractal[0], 0)
-	fractal[1] = append(fractal[1], 1)
+	// fractal = append(fractal, fractal...)
+	// fractal[0] = append(fractal[0], 0)
+	// fractal[1] = append(fractal[1], 1)
 
 }
 
 func GeneratePoints() {
 	fwidth := xMaxFrac - xMinFrac
 	fheight := yMaxFrac - yMinFrac
+	if int(fwidth) == 0 {
+		fwidth = 1
+	}
+	if int(fheight) == 0 {
+		fheight = 1
+	}
 	xratio := WIDTH / int(fwidth)
 	yratio := HEIGHT / int(fheight)
 	xmid := xMinFrac + fwidth/2
 	factor := 0
 	m := 0
 
-	coords := [][]float32{}
+	coords := make([][]float32, WIDTH)
+	for i := range coords {
+		coords[i] = make([]float32, HEIGHT)
+	}
 
 	if xratio < yratio {
 		factor = xratio
@@ -150,6 +173,10 @@ func GeneratePoints() {
 			}
 		}
 	}
+	for i := range points {
+		points[i] = make([]int, 2)
+	}
+
 	for i := 0; i < len(coords); i++ {
 		k := len(coords[i])
 		if k == 0 {
@@ -157,12 +184,15 @@ func GeneratePoints() {
 		}
 		for l := 0; l < k; l++ {
 			if coords[i][l] == 1 {
-				points[m] = append(points[m], i, l)
+				points[m][0] = i
+				points[m][1] = l
+				//points[m] = append(points[m], i, l)
 				m++
 			}
 		}
 	}
 	pngg()
+	svg()
 
 }
 
@@ -181,4 +211,54 @@ func pngg() {
 	f, _ := os.Create("image1.png")
 	png.Encode(f, img)
 	//println(x, y)
+}
+
+func svg() {
+	var x, y float32 //[]float32
+	f, _ := os.Create("image1.svg")
+	defer f.Close()
+	fmt.Fprintf(f, "<svg viewBox='-%d 0 %d %d' xmlns='http://www.w3.org/2000/svg'>\n", 0, WIDTH, HEIGHT)
+
+	//upLeft := image.Point{0, 0}
+	//lowRight := image.Point{width, height}
+	//img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
+	//cyan := color.RGBA{100, 200, 200, 0xff}
+
+	x = 0 //append(x, 0)
+	y = 0 //append(y, 0)
+	curr := 0
+
+	for i := 1; i < POINTS; i++ {
+		z := rand.Intn(101)
+		if z == 1 {
+			x = 0 //append(x, 0)
+			y = 0.16 * y
+			fmt.Fprintf(f, "<circle cx='%v' cy='%g' r='%g' fill='green'/>\n", float32(points[i][0]), float32(HEIGHT-points[i][1]), radius) //x*160, y*100, radius)
+			//fmt.Fprintf(f, "<polygon points='%g,%g'/>\n", x, y)
+			//img.SetRGBA(xPoint(x), yPoint(y), cyan) //  S et(x, y, cyan)
+		}
+		if z >= 2 && z <= 86 {
+			x = 0.85*x + 0.04*y                                                                                                            //append(x, 0.85*x[curr]+0.04*y[curr])
+			y = -0.04*x + 0.85*y + 1.6                                                                                                     //append(y, -0.04*x[curr]+0.85*y[curr]+1.6)
+			fmt.Fprintf(f, "<circle cx='%v' cy='%g' r='%g' fill='green'/>\n", float32(points[i][0]), float32(HEIGHT-points[i][1]), radius) //x*160, y*100, radius)
+			//fmt.Fprintf(f, "<polygon points='%g,%g'/>\n", x, y)
+			//img.SetRGBA(xPoint(x), yPoint(y), cyan)
+		}
+		if z >= 87 && z <= 93 {
+			x = 0.2*x - 0.26*y                                                                                                             //append(x, 0.2*x[curr]-0.26*y[curr])
+			y = 0.23*x + 0.22*y + 1.6                                                                                                      //append(y, 0.23*x[curr]+0.22*y[curr]+1.6)
+			fmt.Fprintf(f, "<circle cx='%v' cy='%g' r='%g' fill='green'/>\n", float32(points[i][0]), float32(HEIGHT-points[i][1]), radius) //x*160, y*100, radius)
+			//fmt.Fprintf(f, "<polygon points='%g,%g'/>\n", x, y)
+			//img.SetRGBA(xPoint(x), yPoint(y), cyan)
+		}
+		if z >= 94 && z <= 100 {
+			x = -0.15*x + 0.28*y                                                                                                           //append(x, -0.15*x[curr]+0.28*y[curr])
+			y = 0.26*x + 0.24*y + 0.44                                                                                                     //append(y, 0.26*x[curr]+0.24*y[curr]+0.44)
+			fmt.Fprintf(f, "<circle cx='%v' cy='%g' r='%g' fill='green'/>\n", float32(points[i][0]), float32(HEIGHT-points[i][1]), radius) //x*160, y*100, radius)
+			//fmt.Fprintf(f, "<polygon points='%g,%g'/>\n", x, y)
+			//img.SetRGBA(xPoint(x), yPoint(y), cyan)
+		}
+		curr = curr + 1
+	}
+	fmt.Fprint(f, "</svg>")
 }
