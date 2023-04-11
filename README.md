@@ -7,8 +7,6 @@ Barnsley's fern uses four affine transformations. The formula for one transforma
 
 ![7a6ccaaa702062c1c63c488c076d4e1d08f94302](https://user-images.githubusercontent.com/45457578/231210876-febbcea4-1213-43c9-9024-9d5d0489b9e4.jpg)
 
-$$\left( x_1 x_2 \right)$$
-$$\left( x'_1 x'_2 \right)$$
 Barnsley shows the IFS code for his Black Spleenwort fern fractal as a matrix of values shown in a table.
 In the table, the columns "a" through "f" are the coefficients of the equation, and "p" represents the probability factor.
 
