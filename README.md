@@ -7,13 +7,17 @@ Barnsley's fern uses four affine transformations. The formula for one transforma
 
 ![7a6ccaaa702062c1c63c488c076d4e1d08f94302](https://user-images.githubusercontent.com/45457578/231210876-febbcea4-1213-43c9-9024-9d5d0489b9e4.jpg)
 
+$$\left( x_1 x_2 \right)$$
+$$\left( x'_1 x'_2 \right)$$
 Barnsley shows the IFS code for his Black Spleenwort fern fractal as a matrix of values shown in a table.
 In the table, the columns "a" through "f" are the coefficients of the equation, and "p" represents the probability factor.
-w 	a 	   b 	    c 	   d 	    e 	f 	  p 	  Portion generated
-ƒ1 	0 	   0 	    0 	   0.16 	0 	0 	  0.01 	Stem
-ƒ2 	0.85 	 0.04 	−0.04  0.85 	0 	1.60 	0.85 	Successively smaller leaflets
-ƒ3 	0.20 	 −0.26 	0.23 	 0.22 	0 	1.60 	0.07 	Largest left-hand leaflet
-ƒ4 	−0.15  0.28 	0.26 	 0.24 	0 	0.44 	0.07 	Largest right-hand leaflet 
+
+| w     | a     | b     | c     | d     | e     | f     | p     | Portion generated |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |  :---: |
+| ƒ1    | 0 	  | 0 	  |   0 	  | 0.16 |	0 |	0 	 | 0.01  |	Stem|
+| ƒ2 | 0.85 	 | 0.04 |	−0.04 | 0.85 |	0 |	1.60 |	0.85 |	Successively smaller leaflets|
+| ƒ3 | 0.20 	| −0.26 |	0.23 	| 0.22 |	0 |	1.60 |	0.07 |	Largest left-hand leaflet|
+| ƒ4 | −0.15 |  0.28 |	0.26 | 0.24 |	0 |	0.44 |	0.07 |	Largest right-hand leaflet| 
 
 By playing with the coefficients, it is possible to create mutant fern varieties. In his paper on V-variable fractals, Barnsley calls this trait a superfractal.
 
