@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"strconv"
 )
 
 type Ferns struct {
@@ -64,7 +65,7 @@ var (
 	yMinFrac   float64 = 0 // габариты фракталов
 	yMaxFrac   float64 = 0 // габариты фракталов
 	probs              = make([]float64, 5)
-	affines            = make([][]float64, 4)
+	affines            = [][]float64{} //make([][]float64, 4)
 	lenFractal         = 0
 	Points             = 100000
 	radius             = 0.69 // для SVG(поле Circle)
@@ -117,6 +118,8 @@ func (fern *Ferns) makeFractal() {
 }
 
 func (fern *Ferns) makeMatrices() {
+	affines = make([][]float64, 4)
+
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 6; j++ {
 			affines[i] = append(affines[i], fern.Fern[i][j])
@@ -190,7 +193,7 @@ func (fern *Ferns) generatePoints() {
 	}
 }
 
-func (fern *Ferns) GenPngg() {
+func (fern *Ferns) GenPng() {
 	lenFractal = 0
 	fern.makeFractal()
 	fern.generatePoints()
@@ -205,7 +208,8 @@ func (fern *Ferns) GenPngg() {
 		img.SetRGBA(points[i][0], fern.PlotHeight-points[i][1], cyan)
 
 	}
-	f, _ := os.Create("fern.png")
+	r := strconv.Itoa(rand.Intn(101))
+	f, _ := os.Create(r + ".png")
 	defer f.Close()
 	png.Encode(f, img)
 }
