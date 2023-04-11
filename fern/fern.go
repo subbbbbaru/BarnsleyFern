@@ -10,74 +10,89 @@ import (
 	"os"
 )
 
-var barnsley = [][]float32{{0, 0, 0, 0.16, 0, 0, 0.01},
+type Ferns struct {
+	Fern       [][]float64
+	PointS     int
+	Scale      float64
+	PlotHeight int
+	PlotWidth  int
+}
+
+var Barnsley = [][]float64{{0, 0, 0, 0.16, 0, 0, 0.01},
 	{0.85, 0.04, -0.04, 0.85, 0, 1.6, 0.85},
 	{0.2, -0.26, 0.23, 0.22, 0, 1.6, 0.07},
 	{-0.15, 0.28, 0.26, 0.24, 0, 0.44, 0.07}}
 
-var cyclosorus = [][]float32{{0, 0, 0, 0.25, 0, -0.4, 0.02},
+var Cyclosorus = [][]float64{{0, 0, 0, 0.25, 0, -0.4, 0.02},
 	{0.95, 0.005, -0.005, 0.93, -0.002, 0.5, 0.84},
 	{0.035, -0.2, 0.16, 0.04, -0.09, 0.02, 0.07},
 	{-0.04, 0.2, 0.16, 0.04, 0.083, 0.12, 0.07}}
 
-var modified = [][]float32{{0, 0, 0, 0.2, 0, -0.12, 0.01},
+var Modified = [][]float64{{0, 0, 0, 0.2, 0, -0.12, 0.01},
 	{0.845, 0.035, -0.035, 0.82, 0, 1.6, 0.85},
 	{0.2, -0.31, 0.255, 0.245, 0, 0.29, 0.07},
 	{-0.15, 0.24, 0.25, 0.20, 0, 0.68, .07}}
 
-var culcita = [][]float32{{0, 0, 0, 0.25, 0, -0.14, 0.02},
+var Culcita = [][]float64{{0, 0, 0, 0.25, 0, -0.14, 0.02},
 	{0.85, 0.02, -0.02, 0.83, 0, 1, 0.84},
 	{0.09, -0.28, 0.3, 0.11, 0, 0.6, 0.07},
 	{-0.09, 0.28, 0.3, 0.09, 0, 0.7, 0.07}}
 
-var fishbone = [][]float32{{0, 0, 0, 0.25, 0, -0.4, 0.02},
+var Fishbone = [][]float64{{0, 0, 0, 0.25, 0, -0.4, 0.02},
 	{0.95, 0.002, -0.002, 0.93, -0.002, 0.5, 0.84},
 	{0.035, -0.11, 0.27, 0.01, -0.05, 0.005, 0.07},
 	{-0.04, 0.11, 0.27, 0.01, 0.047, 0.06, 0.07}}
 
-var tree = [][]float32{{0, 0, 0, 0.5, 0, 0, 0.05},
+var Tree = [][]float64{{0, 0, 0, 0.5, 0, 0, 0.05},
 	{0.42, -0.42, 0.42, 0.42, 0, 0.2, 0.4},
 	{0.42, 0.42, -0.42, 0.42, 0, 0.2, 0.4},
 	{0.1, 0, 0, 0.1, 0, 0.2, 0.15}}
 
-var bee = [][]float32{{0.6178, 0, 0, -.6178, 0, 1, 0.5},
+var Bee = [][]float64{{0.6178, 0, 0, -.6178, 0, 1, 0.5},
 	{0, -0.786, 0.786, 0, 0.786, 0, 0.5},
 	{0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0}}
 
-var ferns = [][][]float32{barnsley, cyclosorus, modified, culcita, fishbone, tree, bee}
-
-var (
-	xMinFrac   float32 = 0    // габариты фракталов
-	xMaxFrac   float32 = 0    // габариты фракталов
-	yMinFrac   float32 = 0    // габариты фракталов
-	yMaxFrac   float32 = 0    // габариты фракталов
-	WIDTH              = 1920 // размер картинки
-	HEIGHT             = 1080 // размер картинки
-	probs              = make([]float32, 5)
-	affines            = make([][]float32, 4)
-	lenFractal         = 0
-	POINTS             = 100000
-	radius             = 0.69 // для SVG
-	fractal            = make([][]float32, POINTS)
-
-	SCALE  = 0.85
-	points = make([][]int, POINTS)
+const (
+	PlotWidth  = 1920 // размер картинки по ширине
+	PlotHeight = 1080 // размер картинки по высоте
 )
 
-func initFractal() {
+var (
+	xMinFrac   float64 = 0 // габариты фракталов
+	xMaxFrac   float64 = 0 // габариты фракталов
+	yMinFrac   float64 = 0 // габариты фракталов
+	yMaxFrac   float64 = 0 // габариты фракталов
+	probs              = make([]float64, 5)
+	affines            = make([][]float64, 4)
+	lenFractal         = 0
+	Points             = 100000
+	radius             = 0.69 // для SVG(поле Circle)
+	fractal            = [][]float64{}
+	points             = [][]int{}
+)
+
+func (fern Ferns) initFractal() {
+	fractal = make([][]float64, fern.PointS)
 	for i := range fractal {
-		fractal[i] = make([]float32, 3)
+		fractal[i] = make([]float64, 3)
 	}
 }
+func (fern Ferns) initPoints() {
+	points = make([][]int, fern.PointS)
+	for i := range points {
+		points[i] = make([]int, 2)
+	}
 
-func MakeFractal() {
+}
 
-	initFractal()
+func (fern *Ferns) makeFractal() {
 
-	makeMatrices()
+	fern.initFractal()
+
+	fern.makeMatrices()
 	var options = len(probs) - 1
-	for i := 1; i < POINTS; i++ {
+	for i := 1; i < fern.PointS; i++ {
 		r := rand.Intn(101)
 		for j := 0; j < options; j++ {
 			if int(probs[j]*100) <= r && r < int(probs[j+1]*100) { // умножаю на 100 чтобы была не нулевая целая часть
@@ -101,24 +116,23 @@ func MakeFractal() {
 	}
 }
 
-func makeMatrices() {
-
+func (fern *Ferns) makeMatrices() {
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 6; j++ {
-			affines[i] = append(affines[i], ferns[0][i][j])
+			affines[i] = append(affines[i], fern.Fern[i][j])
 		}
-		probs[i+1] = probs[i] + ferns[0][i][6]
+		probs[i+1] = probs[i] + fern.Fern[i][6]
 	}
 }
 
-func transform(matrix []float32) {
+func transform(matrix []float64) {
 	lenFractal += 1
 	length := lenFractal
 	fractal[length][0] = (matrix[0] * fractal[length-1][0]) + (matrix[1] * fractal[length-1][1]) + (matrix[4])
 	fractal[length][1] = (matrix[2] * fractal[length-1][0]) + (matrix[3] * fractal[length-1][1]) + (matrix[5])
 }
 
-func GeneratePoints() {
+func (fern *Ferns) generatePoints() {
 	fwidth := xMaxFrac - xMinFrac
 	fheight := yMaxFrac - yMinFrac
 	if int(fwidth) == 0 {
@@ -127,15 +141,15 @@ func GeneratePoints() {
 	if int(fheight) == 0 {
 		fheight = 1
 	}
-	xratio := WIDTH / int(fwidth)
-	yratio := HEIGHT / int(fheight)
+	xratio := fern.PlotWidth / int(fwidth)
+	yratio := fern.PlotHeight / int(fheight)
 	xmid := xMinFrac + fwidth/2
 	factor := 0
 	m := 0
 
-	coords := make([][]float32, WIDTH)
+	coords := make([][]float32, fern.PlotWidth)
 	for i := range coords {
-		coords[i] = make([]float32, HEIGHT)
+		coords[i] = make([]float32, fern.PlotHeight)
 	}
 
 	if xratio < yratio {
@@ -144,21 +158,23 @@ func GeneratePoints() {
 		factor = yratio
 	}
 
-	for k := 0; k < POINTS; k++ {
-		x := math.Round((float64(fractal[k][0])-float64(xmid))*float64(factor)*float64(SCALE) + float64(WIDTH)/2)
-		y := math.Round((float64(fractal[k][1]) - float64(yMinFrac)) * float64(factor) * float64(SCALE))
-		if 0 <= x && x < float64(WIDTH) && 0 <= y && y < float64(HEIGHT) {
+	f, _ := os.Create("coords.txt")
+	defer f.Close()
+
+	for k := 0; k < fern.PointS; k++ {
+		x := math.Round((fractal[k][0]-xmid)*float64(factor)*fern.Scale + float64(fern.PlotWidth)/2)
+		y := math.Round((fractal[k][1] - yMinFrac) * float64(factor) * fern.Scale)
+		if 0 <= x && x < float64(fern.PlotWidth) && 0 <= y && y < float64(fern.PlotHeight) {
 			if coords[int(x)][int(y)] == 0 {
+				fmt.Fprintln(f, int(x), int(y))
 				coords[int(x)][int(y)] = 1
 			} else {
 				coords[int(x)][int(y)]++
+				fmt.Fprintln(f, int(x), int(y))
 			}
 		}
 	}
-	for i := range points {
-		points[i] = make([]int, 2)
-	}
-
+	fern.initPoints()
 	for i := 0; i < len(coords); i++ {
 		k := len(coords[i])
 		if k == 0 {
@@ -172,34 +188,39 @@ func GeneratePoints() {
 			}
 		}
 	}
-	pngg()
-	svg()
-
 }
 
-func pngg() {
+func (fern *Ferns) GenPngg() {
+	lenFractal = 0
+	fern.makeFractal()
+	fern.generatePoints()
 
 	upLeft := image.Point{0, 0}
-	lowRight := image.Point{WIDTH, HEIGHT}
+	lowRight := image.Point{fern.PlotWidth, fern.PlotHeight}
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
 	cyan := color.RGBA{100, 200, 200, 0xff}
 
-	for i := 0; i < POINTS; i++ {
+	for i := 0; i < fern.PointS; i++ {
 
-		img.SetRGBA(points[i][0], HEIGHT-points[i][1], cyan)
+		img.SetRGBA(points[i][0], fern.PlotHeight-points[i][1], cyan)
 
 	}
-	f, _ := os.Create("image1.png")
+	f, _ := os.Create("fern.png")
+	defer f.Close()
 	png.Encode(f, img)
 }
 
-func svg() {
-	f, _ := os.Create("image1.svg")
-	defer f.Close()
-	fmt.Fprintf(f, "<svg viewBox='-%d 0 %d %d' xmlns='http://www.w3.org/2000/svg'>\n", 0, WIDTH, HEIGHT)
+func (fern *Ferns) GenSvg() {
+	lenFractal = 0
+	fern.makeFractal()
+	fern.generatePoints()
 
-	for i := 1; i < POINTS; i++ {
-		fmt.Fprintf(f, "<circle cx='%v' cy='%g' r='%g' fill='green'/>\n", float32(points[i][0]), float32(HEIGHT-points[i][1]), radius) //x*160, y*100, radius)
+	f, _ := os.Create("fern.svg")
+	defer f.Close()
+	fmt.Fprintf(f, "<svg viewBox='%d 0 %d %d' xmlns='http://www.w3.org/2000/svg'>\n", 0, fern.PlotHeight, fern.PlotHeight)
+
+	for i := 1; i < fern.PointS; i++ {
+		fmt.Fprintf(f, "<circle cx='%v' cy='%g' r='%g' fill='cyan'/>\n", float32(points[i][0]), float32(PlotHeight-points[i][1]), radius)
 	}
 	fmt.Fprint(f, "</svg>")
 }
