@@ -8,7 +8,6 @@ import (
 	"math"
 	"math/rand"
 	"os"
-	"strconv"
 )
 
 type Ferns struct {
@@ -17,7 +16,6 @@ type Ferns struct {
 	Scale      float64
 	PlotHeight int
 	PlotWidth  int
-	gg         int
 }
 
 var Barnsley = [][]float64{{0, 0, 0, 0.16, 0, 0, 0.01},
@@ -198,7 +196,7 @@ func (fern *Ferns) generatePoints() [][]int {
 	return points
 }
 
-func (fern *Ferns) GenPng() {
+func (fern *Ferns) GenPng(str string) {
 	points := fern.generatePoints()
 
 	upLeft := image.Point{0, 0}
@@ -211,16 +209,15 @@ func (fern *Ferns) GenPng() {
 		img.SetRGBA(points[i][0], fern.PlotHeight-points[i][1], cyan)
 
 	}
-	r := strconv.Itoa(rand.Intn(101))
-	f, _ := os.Create(r + ".png")
+	f, _ := os.Create(str + ".png")
 	defer f.Close()
 	png.Encode(f, img)
 }
 
-func (fern *Ferns) GenSvg() {
+func (fern *Ferns) GenSvg(str string) {
 	points := fern.generatePoints()
 
-	f, _ := os.Create("fern.svg")
+	f, _ := os.Create(str + ".svg")
 	defer f.Close()
 	fmt.Fprintf(f, "<svg viewBox='%d 0 %d %d' xmlns='http://www.w3.org/2000/svg'>\n", 0, fern.PlotHeight, fern.PlotHeight)
 

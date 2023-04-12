@@ -4,7 +4,8 @@ import (
 	"errors"
 	"flag"
 	"log"
-	"subbbbbaru/fern"
+
+	"github.com/subbbbbaru/BarnsleyFern/fern"
 )
 
 var (
@@ -29,41 +30,41 @@ const (
 
 func init() {
 	flagRenderFormat = flag.Int("f", 1, "Render format")
-	flagFern = flag.Int("fern", 1, "Format of fern")
+	flagFern = flag.Int("fern", 0, `Format of fern:
+	0: Barnsley
+	1: Cyclosorus
+	2: Modified
+	3: Culcita
+	4: Fishbone
+	5: Tree
+	6: Bee
+	7: Your`)
 	flagScale = flag.Float64("s", 0.85, "Format of fern scale")
 	flagWidth = flag.Int("w", fern.PlotWidth, "Format of fern image width")
 	flagHeight = flag.Int("h", fern.PlotHeight, "Format of fern image height")
 	flagPoints = flag.Int("p", fern.Points, "Format of fern points")
 }
 
-func selectFern() (*[][]float64, error) {
+func selectFern() (string, *[][]float64, error) {
 	switch *flagFern {
 	case Barnsley:
-		return &fern.Barnsley, nil
-		//myFern.Fern = fern.Barnsley
+		return "Barnsley", &fern.Barnsley, nil
 	case Cyclosorus:
-		return &fern.Cyclosorus, nil
-		//myFern.Fern = fern.Cyclosorus
+		return "Cyclosorus", &fern.Cyclosorus, nil
 	case Modified:
-		return &fern.Modified, nil
-		//myFern.Fern = fern.Modified
+		return "Modified", &fern.Modified, nil
 	case Culcita:
-		return &fern.Culcita, nil
-		//myFern.Fern = fern.Culcita
+		return "Culcita", &fern.Culcita, nil
 	case Fishbone:
-		return &fern.Fishbone, nil
-		//myFern.Fern = fern.Fishbone
+		return "Fishbone", &fern.Fishbone, nil
 	case Tree:
-		return &fern.Tree, nil
-		//myFern.Fern = fern.Tree
+		return "Tree", &fern.Tree, nil
 	case Bee:
-		return &fern.Bee, nil
-		//myFern.Fern = fern.Bee
+		return "Bee", &fern.Bee, nil
 	case Your:
-		str := "Soon..."
-		return nil, errors.New(str)
+		return "Your", nil, errors.New("soon")
 	}
-	return nil, errors.New("Wrong flag")
+	return "", nil, errors.New("wrong flag")
 }
 
 func selectScale() {
@@ -87,7 +88,7 @@ func selectSize() {
 func main() {
 	flag.Parse()
 	mmF := &fern.Ferns{}
-	selectedFern, err := selectFern()
+	strFern, selectedFern, err := selectFern()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -103,11 +104,10 @@ func main() {
 
 	switch *flagRenderFormat {
 	case 1:
-		mmF.GenPng()
+		mmF.GenPng(strFern)
 	case 2:
-		mmF.GenSvg()
+		mmF.GenSvg(strFern)
 	default:
 		log.Panic("Error only 2 format(1: png, 2: svg)")
 	}
-
 }
